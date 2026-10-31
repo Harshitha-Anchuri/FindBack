@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FindBack – Lost something? Get it back.</title>
+<style>
+:root{--bg:#f7f9fc;--surface:#fff;--text:#14213d;--muted:#5b6578;--accent:#0f766e;--accent-text:#fff;--soft:#e3f4f1;--border:#dde3ec;--lost:#b45309;--lostbg:#fef3c7;--found:#0f766e;--foundbg:#d1fae5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1522;--surface:#162033;--text:#eef2f8;--muted:#9fb0c8;--accent:#2dd4bf;--accent-text:#04201c;--soft:#12332f;--border:#25324a;--lost:#fcd34d;--lostbg:#3b2a08;--found:#6ee7b7;--foundbg:#0b3326}}
+:root[data-theme="dark"]{--bg:#0e1522;--surface:#162033;--text:#eef2f8;--muted:#9fb0c8;--accent:#2dd4bf;--accent-text:#04201c;--soft:#12332f;--border:#25324a;--lost:#fcd34d;--lostbg:#3b2a08;--found:#6ee7b7;--foundbg:#0b3326}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;padding-top:12px;padding-bottom:12px}
+.logo{font-weight:800;font-size:1.2rem}.logo span{color:var(--accent)}
+nav a{color:var(--muted);text-decoration:none;margin-left:16px;font-size:.92rem}
+.hero{text-align:center;padding:42px 0 26px}
+.pill{display:inline-block;background:var(--soft);color:var(--accent);padding:5px 14px;border-radius:99px;font-size:.85rem;font-weight:600}
+h1{font-size:clamp(1.9rem,6vw,3.1rem);line-height:1.15;margin:16px 0 12px}
+h1 em{font-style:normal;color:var(--accent)}
+.hero p{max-width:580px;margin:0 auto 22px;color:var(--muted);font-size:1.05rem}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-text);padding:11px 22px;border-radius:10px;font-weight:700;text-decoration:none;margin:4px;border:0;font-size:.95rem;cursor:pointer;font-family:inherit}
+.btn.alt{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn.sm{padding:7px 13px;font-size:.85rem;margin:0}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:30px;margin:26px 0 6px}
+.stats div{text-align:center}.stats b{display:block;font-size:1.8rem;color:var(--accent)}.stats span{color:var(--muted);font-size:.85rem}
+section{padding:32px 0}
+h2{text-align:center;font-size:1.6rem;margin:0 0 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card h3{margin:0 0 6px;font-size:1.02rem}.card p{margin:0;color:var(--muted);font-size:.92rem}
+.card .i{font-size:1.5rem;margin-bottom:4px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+input,select,textarea{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 11px;width:100%}
+.tools input{flex:2 1 200px;width:auto}.tools select{flex:1 1 130px;width:auto}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab#dl{margin-left:auto}
+.tab{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:7px 15px;border-radius:99px;cursor:pointer;font:inherit;font-size:.9rem}
+.tab.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.it{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.it .top{display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:99px}
+.tag.lost{background:var(--lostbg);color:var(--lost)}.tag.found{background:var(--foundbg);color:var(--found)}
+.it h3{margin:0;font-size:1.05rem}.it .meta{color:var(--muted);font-size:.85rem}
+.it .d{font-size:.92rem;margin:0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.match{background:var(--soft);border-radius:9px;padding:8px 10px;font-size:.84rem}
+.match button{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:0;font:inherit;text-decoration:underline}
+.res{opacity:.55}
+.ph{width:100%;max-height:170px;object-fit:cover;border-radius:10px}
+.empty{text-align:center;color:var(--muted);padding:30px}
+form.f{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form.f .full{grid-column:1/-1}
+form.f label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:3px}
+@media(max-width:560px){form.f{grid-template-columns:1fr}}
+.seg{display:flex;gap:8px}.seg label{flex:1;margin:0;border:1.5px solid var(--border);border-radius:9px;padding:9px;text-align:center;cursor:pointer;color:var(--text);font-size:.92rem}
+.seg input{display:none;width:auto}.seg input:checked+span{font-weight:800;color:var(--accent)}
+.seg label:has(input:checked){border-color:var(--accent);background:var(--soft)}
+dialog{border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);max-width:420px;width:92%;padding:20px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h3{margin:0 0 6px}dialog p{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+dialog .r{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+#toast.on{opacity:1}
+.cta{background:var(--soft);border-radius:18px;text-align:center;padding:34px 18px}
+.cta p{color:var(--muted);margin:0 0 16px}
+.contact{text-align:center;color:var(--muted)}.contact a{color:var(--accent);font-weight:600;text-decoration:none}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:22px 0 28px;border-top:1px solid var(--border)}
+.note{text-align:center;color:var(--muted);font-size:.8rem;margin-top:10px}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><div class="logo">Find<span>Back</span></div><div><a href="#board">Browse</a><a href="#post">Post</a><a href="#how">How it works</a><a href="#contact">Contact</a></div></div></nav>
+<div class="wrap">
+
+<header class="hero">
+<span class="pill">Lost &amp; Found, reimagined</span>
+<h1>Lost something? <em>Get it back</em> &mdash; faster.</h1>
+<p>Post what you lost or found, get smart match suggestions, and reclaim items through a verified handover.</p>
+<a class="btn" href="#post" data-type="lost">I lost something</a>
+<a class="btn alt" href="#post" data-type="found">I found something</a>
+<div class="stats">
+<div><b id="sLost">0</b><span>items lost</span></div>
+<div><b id="sFound">0</b><span>items found</span></div>
+<div><b id="sRes">0</b><span>reunited</span></div>
+</div>
+</header>
+
+<section id="board">
+<h2>Browse reports</h2>
+<div class="tools">
+<input id="q" type="search" placeholder="Search item, place or detail…" aria-label="Search">
+<select id="fc" aria-label="Category"><option value="">All categories</option></select>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-f="all">All</button><button class="tab" data-f="lost">Lost</button><button class="tab" data-f="found">Found</button><button class="tab" data-f="open">Open only</button><button class="tab" data-f="mine">My reports</button><button class="tab" id="dl" style="margin-left:auto">⬇ My CSV</button>
+</div>
+<p class="note" id="mode" style="margin:0 0 10px"></p><div class="items" id="list"></div>
+</section>
+
+<section id="post">
+<h2>Post a report</h2>
+<form class="f" id="form" autocomplete="off">
+<div class="full"><div class="seg">
+<label><input type="radio" name="type" value="lost" checked><span>🔍 I lost it</span></label>
+<label><input type="radio" name="type" value="found"><span>🎁 I found it</span></label>
+</div></div>
+<div><label for="title">Item name *</label><input id="title" required maxlength="60" placeholder="e.g. Black backpack"></div>
+<div><label for="cat">Category *</label><select id="cat" required></select></div>
+<div><label for="loc">Where? *</label><input id="loc" required maxlength="60" placeholder="e.g. Library, Block B"></div>
+<div><label for="date">Date *</label><input id="date" type="date" required></div>
+<div class="full"><label for="desc">Description (colour, brand, marks)</label><textarea id="desc" rows="3" maxlength="300"></textarea></div>
+<div class="full"><label for="photo">Photo (optional)</label><input id="photo" type="file" accept="image/*"><img id="pv" class="ph" alt="Preview" style="display:none;margin-top:8px;max-width:180px"></div>
+<div class="full"><label for="contact">Your email or phone *</label><input id="contact" required maxlength="60"></div>
+<div class="full"><button class="btn" type="submit" style="width:100%">Submit report</button></div>
+</form>
+<p class="note">Your contact stays hidden until you approve a verified claim.</p>
+</section>
+
+<section id="how">
+<h2>How it works</h2>
+<div class="grid">
+<div class="card"><div class="i">📝</div><h3>1. Post</h3><p>Describe the item, place and time.</p></div>
+<div class="card"><div class="i">🤝</div><h3>2. Get matched</h3><p>We score reports by category, words and place, and suggest likely matches.</p></div>
+<div class="card"><div class="i">🔒</div><h3>3. Verify &amp; reclaim</h3><p>Claimants describe a private detail before contact is shared.</p></div>
+<div class="card"><div class="i">✅</div><h3>4. Mark returned</h3><p>Close the report once the item is back.</p></div>
+</div>
+</section>
+
+<section>
+<div class="cta">
+<h2>Want FindBack at your campus or office?</h2>
+<p>We are onboarding early partners.</p>
+<a class="btn" href="mailto:hello@findback.example?subject=Request%20a%20demo">Request a demo</a>
+<a class="btn alt" href="mailto:hello@findback.example?subject=Early%20access">Join early access</a>
+</div>
+</section>
+
+<section id="contact" class="contact">
+<h2>Contact us</h2>
+<p>Email: <a href="mailto:hello@findback.example">hello@findback.example</a> &nbsp;|&nbsp; Phone: +91 00000 00000</p>
+<p>Instagram: <a href="#contact">@findback.app</a> &nbsp;|&nbsp; LinkedIn: <a href="#contact">FindBack</a></p>
+</section>
+<footer>&copy; 2026 FindBack. All rights reserved.</footer>
+</div>
+
+<dialog id="dlg">
+<h3 id="dT">Claim this item</h3>
+<p id="dP"></p>
+<label for="dV" style="font-size:.85rem;color:var(--muted)">Private detail only the owner would know *</label>
+<textarea id="dV" rows="3" maxlength="200"></textarea>
+<label for="dC" style="font-size:.85rem;color:var(--muted);display:block;margin-top:8px">Your email or phone *</label>
+<input id="dC" maxlength="60">
+<div class="r"><button class="btn alt sm" id="dX">Cancel</button><button class="btn sm" id="dOK">Send</button></div>
+</dialog>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+var CATS={"Bags":"🎒","Phones & Electronics":"📱","Wallets & Cards":"👛","Keys":"🔑","Documents & IDs":"🪪","Jewellery & Watches":"⌚","Clothing":"🧥","Books & Stationery":"📚","Pets":"🐾","Other":"📦"};
+var KEY="findback_items_v2",ME="findback_me";
+var today=new Date().toISOString().slice(0,10);
+var db=null,remote=[],local=[],myId="",photo="",filter="all",claimId=null;
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},3200);}
+try{local=JSON.parse(localStorage.getItem(KEY)||"[]");if(!Array.isArray(local))local=[];}catch(e){local=[];}
+try{myId=localStorage.getItem(ME)||"";if(!myId){myId="u"+Math.random().toString(36).slice(2,10);localStorage.setItem(ME,myId);}}catch(e){myId=myId||"u"+Date.now();}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(local));}catch(e){toast("Device storage is full. Delete a report or use a smaller photo.");}}
+function seed(){var d=today;function m(i,t,ti,c,l,ds){return {id:"s"+i,type:t,title:ti,cat:c,loc:l,date:d,desc:ds,contact:"demo"+i+"@example.com",owner:"seed",status:"open",claims:[],photo:"",approved:""};}
+ return [m(1,"lost","Black backpack","Bags","Central Library","Black laptop backpack with a red keychain."),m(2,"found","Black bag with laptop","Bags","Library reading hall","Found on a desk, handed to the front desk."),m(3,"lost","House keys","Keys","Bus stand","Three keys on a blue ring."),m(4,"found","Student ID card","Documents & IDs","Canteen","ID card, name partly faded."),m(5,"found","Silver wrist watch","Jewellery & Watches","Sports ground","Analog watch with a leather strap.")];}
+function all(){remote.forEach(function(i){i._src="r";});local.forEach(function(i){i._src="l";});return remote.concat(local);}
+function find(id){var a=all();for(var i=0;i<a.length;i++){if(a[i].id===id)return a[i];}return null;}
+function clean(it){var o=JSON.parse(JSON.stringify(it));delete o._src;return o;}
+function persist(it){
+ if(it._src==="r"){return db.collection("reports").doc(it.id).set(clean(it)).catch(function(){toast("Could not save. You may have view-only access.");});}
+ saveLocal();return Promise.resolve();
+}
+function create(it){
+ if(db){return db.collection("reports").doc(it.id).set(it).then(function(){return "r";}).catch(function(){local.push(it);saveLocal();toast("Shared board is view-only for you, so this report is saved on this device only.");return "l";});}
+ local.push(it);saveLocal();return Promise.resolve("l");
+}
+function remove(it){
+ if(it._src==="r"){return db.collection("reports").doc(it.id).delete().catch(function(){toast("Could not delete.");});}
+ local=local.filter(function(o){return o.id!==it.id;});saveLocal();return Promise.resolve();
+}
+function boot(){if(!db&&!local.length){local=seed();saveLocal();}render();}
+function init(){
+ if(!window.claude||!claude.use){boot();return;}
+ var done=false,t=setTimeout(function(){if(!done){done=true;boot();}},10000);
+ Promise.all([claude.use("db"),claude.use("user")]).then(function(r){
+  if(done)return;done=true;clearTimeout(t);db=r[0];
+  var p=(r[1]&&r[1].id)?r[1].id():Promise.resolve(null);
+  return p.catch(function(){return null;}).then(function(id){
+   if(id)myId=id;
+   if(!db){boot();return;}
+   db.collection("reports").onSnapshot(function(s){remote=s.docs.map(function(d){var o=JSON.parse(JSON.stringify(d.data()));o.id=String(d.id);return o;});render();},function(){db=null;boot();});
+   render();
+  });
+ }).catch(function(){if(!done){done=true;clearTimeout(t);}boot();});
+}
+
+var catHtml="",k;for(k in CATS){catHtml+='<option value="'+esc(k)+'">'+CATS[k]+" "+esc(k)+"</option>";}
+$("cat").innerHTML=catHtml;$("fc").innerHTML='<option value="">All categories</option>'+catHtml;
+$("date").value=today;$("date").max=today;
+
+function words(s){return String(s).toLowerCase().split(/[^a-z0-9]+/).filter(function(w){return w.length>2;});}
+function score(a,b){var s=0,i;if(a.cat===b.cat)s+=2;
+ var wa=words(a.title+" "+a.desc),wb=words(b.title+" "+b.desc),h=0;for(i=0;i<wa.length;i++){if(wb.indexOf(wa[i])>-1)h++;}
+ s+=Math.min(h,3)*1.5;var la=words(a.loc),lb=words(b.loc),lh=0;for(i=0;i<la.length;i++){if(lb.indexOf(la[i])>-1)lh++;}
+ return s+Math.min(lh,2);}
+function bestMatch(it){var best=null,bs=0;all().forEach(function(o){if(o.type===it.type||o.status!=="open")return;var s=score(it,o);if(s>bs){bs=s;best=o;}});
+ return bs>=4?{item:best,pct:Math.min(98,Math.round(bs/8*100))}:null;}
+function approvedForMe(it){if(!it.approved)return false;return (it.claims||[]).some(function(c){return c.id===it.approved&&c.by===myId;});}
+
+function render(){
+ var q=$("q").value.trim().toLowerCase(),c=$("fc").value;
+ var list=all().filter(function(it){
+  if(filter==="lost"&&it.type!=="lost")return false;if(filter==="found"&&it.type!=="found")return false;
+  if(filter==="open"&&it.status==="resolved")return false;if(filter==="mine"&&it.owner!==myId)return false;
+  if(c&&it.cat!==c)return false;
+  return !q||(it.title+" "+it.loc+" "+it.desc+" "+it.cat).toLowerCase().indexOf(q)>-1;
+ }).sort(function(a,b){return String(b.date).localeCompare(String(a.date))||(b.id<a.id?-1:1);});
+ var h="";
+ list.forEach(function(it){
+  var mine=it.owner===myId,res=it.status==="resolved",m=(!res&&mine)?bestMatch(it):null,cl=it.claims||[];
+  h+='<article class="it'+(res?" res":"")+'"><div class="top"><span class="tag '+it.type+'">'+(it.type==="lost"?"LOST":"FOUND")+'</span><span class="meta">'+esc(it.date)+(mine?" · yours":"")+'</span></div>'
+  +(it.photo?'<img class="ph" alt="" src="'+esc(it.photo)+'">':"")
+  +'<h3>'+(CATS[it.cat]||"📦")+" "+esc(it.title)+'</h3><div class="meta">📍 '+esc(it.loc)+" · "+esc(it.cat)+'</div>'
+  +(it.desc?'<p class="d">'+esc(it.desc)+'</p>':"")
+  +(m?'<div class="match">⚡ Possible match ('+m.pct+'%): <button data-s="'+esc(m.item.id)+'">'+esc(m.item.title)+'</button></div>':"")
+  +((mine||approvedForMe(it))?'<div class="meta">📞 '+esc(it.contact)+'</div>':'<div class="meta">🔒 Contact shared after verification</div>');
+  if(mine&&!res){cl.forEach(function(x){h+='<div class="match"><b>Claim:</b> '+esc(x.detail)+'<br>'+esc(x.contact)+' '+(it.approved===x.id?'✅ approved':'<button data-ap="'+esc(it.id)+'|'+esc(x.id)+'">Approve</button>')+'</div>';});}
+  else if(cl.length&&!res){h+='<div class="meta">'+cl.length+' claim(s) received</div>';}
+  h+='<div class="acts">';
+  if(res){h+='<span class="meta">✅ Reunited</span>';}
+  else if(!mine){h+='<button class="btn sm" data-c="'+esc(it.id)+'">'+(it.type==="found"?"This is mine":"I found this")+'</button>';}
+  else{h+='<button class="btn alt sm" data-r="'+esc(it.id)+'">Mark returned</button>';}
+  if(mine){h+='<button class="btn alt sm" data-d="'+esc(it.id)+'" aria-label="Delete">🗑</button>';}
+  h+='</div></article>';
+ });
+ $("list").innerHTML=h||'<div class="empty">No reports here yet. Post one below.</div>';
+ var a=all(),l=0,f=0,r=0;a.forEach(function(it){if(it.type==="lost")l++;else f++;if(it.status==="resolved")r++;});
+ $("sLost").textContent=l;$("sFound").textContent=f;$("sRes").textContent=r;
+ $("mode").textContent=db?"🌐 Shared board: everyone sees new reports live":"💾 Offline demo: reports stay on this device";
+}
+function setTab(f){filter=f;Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.toggle("on",t.getAttribute("data-f")===f);});}
+$("q").addEventListener("input",render);$("fc").addEventListener("change",render);
+$("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;setTab(b.getAttribute("data-f"));render();});
+
+$("list").addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t)return;var it;
+ if(t.hasAttribute("data-c")){it=find(t.getAttribute("data-c"));claimId=it.id;
+  $("dT").textContent=it.type==="found"?"Claim this item":"Tell the owner you found this";
+  $("dP").textContent=it.type==="found"?"Describe something only the owner would know (a mark, the contents, lock-screen). The finder reviews this before sharing contact.":"Say where and how you found it. The owner reviews this before sharing contact.";
+  $("dV").value="";$("dC").value="";$("dlg").showModal();}
+ else if(t.hasAttribute("data-r")){it=find(t.getAttribute("data-r"));it.status="resolved";persist(it).then(render);render();toast("Marked as returned 🎉");}
+ else if(t.hasAttribute("data-d")){it=find(t.getAttribute("data-d"));if(confirm("Delete this report?")){remove(it).then(render);render();}}
+ else if(t.hasAttribute("data-ap")){var p=t.getAttribute("data-ap").split("|");it=find(p[0]);it.approved=p[1];persist(it).then(render);render();toast("Approved. The claimant can now see your contact.");}
+ else if(t.hasAttribute("data-s")){$("q").value=find(t.getAttribute("data-s")).title;setTab("all");render();}
+});
+$("dX").onclick=function(){$("dlg").close();};
+$("dOK").onclick=function(){
+ var v=$("dV").value.trim(),c=$("dC").value.trim();if(!v||!c){toast("Please fill both fields");return;}
+ var it=find(claimId);it.claims=(it.claims||[]).concat([{id:"c"+Date.now(),by:myId,detail:v,contact:c,at:Date.now()}]);
+ $("dlg").close();persist(it).then(render);render();toast("Claim sent. You will see their contact once approved.");
+};
+Array.prototype.forEach.call(document.querySelectorAll("[data-type]"),function(a){a.addEventListener("click",function(){var r=document.querySelector('input[name="type"][value="'+a.getAttribute("data-type")+'"]');if(r)r.checked=true;});});
+
+function shrink(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,360/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",.6));};im.onerror=function(){cb("");};im.src=r.result;};r.onerror=function(){cb("");};r.readAsDataURL(file);}
+$("photo").addEventListener("change",function(){var f=this.files[0];photo="";$("pv").style.display="none";if(!f)return;shrink(f,function(d){photo=d;if(d){$("pv").src=d;$("pv").style.display="block";}});});
+
+$("form").addEventListener("submit",function(e){
+ e.preventDefault();
+ var it={id:"r"+Date.now()+Math.random().toString(36).slice(2,5),type:document.querySelector('input[name="type"]:checked').value,title:$("title").value.trim(),cat:$("cat").value,loc:$("loc").value.trim(),date:$("date").value,desc:$("desc").value.trim(),contact:$("contact").value.trim(),owner:myId,status:"open",claims:[],photo:photo,approved:""};
+ if(!it.title||!it.loc||!it.contact){toast("Please fill required fields");return;}
+ var m=bestMatch(it);
+ create(it).then(function(){
+  $("form").reset();$("date").value=today;photo="";$("pv").style.display="none";$("q").value="";$("fc").value="";setTab("mine");render();
+  toast(m?"Posted! Possible match: "+m.item.title:"Report posted ✅");$("board").scrollIntoView();
+ });
+});
+
+$("dl").onclick=function(){
+ if(!window.claude||!claude.use){toast("Download is unavailable here");return;}
+ claude.use("downloads").then(function(d){
+  if(!d){toast("Download is unavailable here");return;}
+  function q(s){return '"'+String(s).replace(/"/g,'""')+'"';}
+  var rows=[["type","item","category","place","date","status"]].concat(all().filter(function(i){return i.owner===myId;}).map(function(i){return [i.type,i.title,i.cat,i.loc,i.date,i.status];}));
+  return d.save({filename:"my-findback-reports.csv",data:rows.map(function(r){return r.map(q).join(",");}).join("\n")});
+ }).catch(function(){});
+};
+init();
+})();
+</script>
+
+</body>
+</html>
